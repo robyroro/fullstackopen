@@ -78,7 +78,8 @@ const App = () => {
     }
 
     const returnedBlog = await blogService.update(blog.id, updatedBlog)
-    setBlogs(blogs.map(b => b.id !== blog.id ? b : returnedBlog))
+    // keep the user info, the response might only contain the user id
+    setBlogs(blogs.map(b => b.id !== blog.id ? b : { ...returnedBlog, user: blog.user }))
   }
 
   if (user === null) {
