@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
-import { Routes, Route, Link, useNavigate } from 'react-router-dom'
-import Blog from './components/Blog'
+import { Routes, Route, Link, useNavigate, useMatch } from 'react-router-dom'
 import BlogForm from './components/BlogForm'
+import BlogList from './components/BlogList'
+import BlogView from './components/BlogView'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
@@ -14,6 +15,7 @@ const App = () => {
   const [notification, setNotification] = useState(null)
   const blogFormRef = useRef()
   const navigate = useNavigate()
+  const match = useMatch('/blogs/:id')
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -95,6 +97,10 @@ const App = () => {
     }
   }
 
+  const blog = match
+    ? blogs.find(b => b.id === match.params.id)
+    : null
+
   const padding = {
     padding: 5
   }
@@ -116,6 +122,14 @@ const App = () => {
 
       <Routes>
         <Route path="/login" element={<LoginForm handleLogin={handleLogin} />} />
+        <Route path="/blogs/:id" element={
+          <BlogView
+            blog={blog}
+            user={user}
+            handleLike={likeBlog}
+            handleRemove={removeBlog}
+          />
+        } />
         <Route path="/" element={
           <div>
             {user && (
@@ -124,15 +138,7 @@ const App = () => {
               </Togglable>
             )}
 
-            {[...blogs].sort((a, b) => b.likes - a.likes).map(blog =>
-              <Blog
-                key={blog.id}
-                blog={blog}
-                handleLike={likeBlog}
-                handleRemove={removeBlog}
-                currentUser={user}
-              />
-            )}
+            <BlogList blogs={blogs} />
           </div>
         } />
       </Routes>
