@@ -12,8 +12,8 @@ const App = () => {
   const [filter, setFilter] = useState('')
   const [message, setMessage] = useState(null)
 
-  const notify = (text) => {
-    setMessage(text)
+  const notify = (text, type = 'success') => {
+    setMessage({ text, type })
     setTimeout(() => {
       setMessage(null)
     }, 5000)
@@ -45,6 +45,10 @@ const App = () => {
             setNewName('')
             setNewNumber('')
           })
+          .catch(() => {
+            notify(`Information of ${existing.name} has already been removed from server`, 'error')
+            setPersons(persons.filter(p => p.id !== existing.id))
+          })
       }
       return
     }
@@ -68,6 +72,10 @@ const App = () => {
       personService
         .remove(person.id)
         .then(() => {
+          setPersons(persons.filter(p => p.id !== person.id))
+        })
+        .catch(() => {
+          notify(`Information of ${person.name} has already been removed from server`, 'error')
           setPersons(persons.filter(p => p.id !== person.id))
         })
     }
