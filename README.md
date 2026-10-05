@@ -7,3 +7,4 @@ My solutions for the [Full Stack Open](https://fullstackopen.com/en/) course.
 - [Part 2](part2/)
 - [Part 3](part3/)
 - [Part 4](part4/)
+- [Part 5](part5/)
