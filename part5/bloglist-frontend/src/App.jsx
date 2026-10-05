@@ -1,11 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
-import { Routes, Route, Link, useNavigate, useMatch } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Routes, Route, Link, Navigate, useNavigate, useMatch } from 'react-router-dom'
 import BlogForm from './components/BlogForm'
 import BlogList from './components/BlogList'
 import BlogView from './components/BlogView'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
-import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -13,7 +12,6 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState(null)
-  const blogFormRef = useRef()
   const navigate = useNavigate()
   const match = useMatch('/blogs/:id')
 
@@ -61,9 +59,9 @@ const App = () => {
   const addBlog = async (blogObject) => {
     try {
       const returnedBlog = await blogService.create(blogObject)
-      blogFormRef.current.toggleVisibility()
       setBlogs(blogs.concat(returnedBlog))
       notify(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
+      navigate('/')
     } catch (error) {
       notify(error.response?.data?.error || 'creating the blog failed', 'error')
     }
@@ -92,6 +90,7 @@ const App = () => {
       await blogService.remove(blog.id)
       setBlogs(blogs.filter(b => b.id !== blog.id))
       notify(`removed blog ${blog.title}`)
+      navigate('/')
     } catch (error) {
       notify(error.response?.data?.error || 'removing the blog failed', 'error')
     }
@@ -109,6 +108,7 @@ const App = () => {
     <div>
       <div>
         <Link style={padding} to="/">blogs</Link>
+        {user && <Link style={padding} to="/create">create new</Link>}
         {user
           ? <span>
             {user.name} logged in <button onClick={handleLogout}>logout</button>
@@ -130,17 +130,10 @@ const App = () => {
             handleRemove={removeBlog}
           />
         } />
-        <Route path="/" element={
-          <div>
-            {user && (
-              <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-                <BlogForm createBlog={addBlog} />
-              </Togglable>
-            )}
-
-            <BlogList blogs={blogs} />
-          </div>
+        <Route path="/create" element={
+          user ? <BlogForm createBlog={addBlog} /> : <Navigate replace to="/login" />
         } />
+        <Route path="/" element={<BlogList blogs={blogs} />} />
       </Routes>
     </div>
   )
