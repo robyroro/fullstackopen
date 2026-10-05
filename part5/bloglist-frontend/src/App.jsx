@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Routes, Route, Link, Navigate, useNavigate, useMatch } from 'react-router-dom'
-import { Container } from '@mui/material'
+import { Container, AppBar, Toolbar, Button, Typography, Box } from '@mui/material'
 import BlogForm from './components/BlogForm'
 import BlogList from './components/BlogList'
 import BlogView from './components/BlogView'
@@ -101,24 +101,34 @@ const App = () => {
     ? blogs.find(b => b.id === match.params.id)
     : null
 
-  const padding = {
-    padding: 5
-  }
-
   return (
     <Container>
-      <div>
-        <Link style={padding} to="/">blogs</Link>
-        {user && <Link style={padding} to="/create">create new</Link>}
-        {user
-          ? <span>
-            {user.name} logged in <button onClick={handleLogout}>logout</button>
-          </span>
-          : <Link style={padding} to="/login">login</Link>
-        }
-      </div>
+      <AppBar position="static">
+        <Toolbar>
+          <Button color="inherit" component={Link} to="/">
+            blogs
+          </Button>
+          {user && (
+            <Button color="inherit" component={Link} to="/create">
+              create new
+            </Button>
+          )}
+          <Box sx={{ flexGrow: 1 }} />
+          {user
+            ? <>
+              <Typography component="em" sx={{ mr: 1 }}>{user.name} logged in</Typography>
+              <Button color="inherit" variant="outlined" onClick={handleLogout}>
+                logout
+              </Button>
+            </>
+            : <Button color="inherit" component={Link} to="/login">
+              login
+            </Button>
+          }
+        </Toolbar>
+      </AppBar>
 
-      <h2>blogs</h2>
+      <Typography variant="h4" sx={{ my: 2 }}>blogs</Typography>
       <Notification notification={notification} />
 
       <Routes>
