@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
+import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
+import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
@@ -8,11 +10,10 @@ import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState(null)
   const blogFormRef = useRef()
+  const navigate = useNavigate()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -36,16 +37,13 @@ const App = () => {
     }, 5000)
   }
 
-  const handleLogin = async (event) => {
-    event.preventDefault()
-
+  const handleLogin = async (credentials) => {
     try {
-      const user = await loginService.login({ username, password })
+      const user = await loginService.login(credentials)
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
       blogService.setToken(user.token)
       setUser(user)
-      setUsername('')
-      setPassword('')
+      navigate('/')
     } catch {
       notify('wrong username or password', 'error')
     }
@@ -55,6 +53,7 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     blogService.setToken(null)
     setUser(null)
+    navigate('/')
   }
 
   const addBlog = async (blogObject) => {
@@ -96,59 +95,47 @@ const App = () => {
     }
   }
 
-  if (user === null) {
-    return (
-      <div>
-        <h2>log in to application</h2>
-        <Notification notification={notification} />
-        <form onSubmit={handleLogin}>
-          <div>
-            <label>
-              username
-              <input
-                type="text"
-                value={username}
-                onChange={({ target }) => setUsername(target.value)}
-              />
-            </label>
-          </div>
-          <div>
-            <label>
-              password
-              <input
-                type="password"
-                value={password}
-                onChange={({ target }) => setPassword(target.value)}
-              />
-            </label>
-          </div>
-          <button type="submit">login</button>
-        </form>
-      </div>
-    )
+  const padding = {
+    padding: 5
   }
 
   return (
     <div>
+      <div>
+        <Link style={padding} to="/">blogs</Link>
+        {user
+          ? <span>
+            {user.name} logged in <button onClick={handleLogout}>logout</button>
+          </span>
+          : <Link style={padding} to="/login">login</Link>
+        }
+      </div>
+
       <h2>blogs</h2>
       <Notification notification={notification} />
-      <p>
-        {user.name} logged in <button onClick={handleLogout}>logout</button>
-      </p>
 
-      <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-        <BlogForm createBlog={addBlog} />
-      </Togglable>
+      <Routes>
+        <Route path="/login" element={<LoginForm handleLogin={handleLogin} />} />
+        <Route path="/" element={
+          <div>
+            {user && (
+              <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+                <BlogForm createBlog={addBlog} />
+              </Togglable>
+            )}
 
-      {[...blogs].sort((a, b) => b.likes - a.likes).map(blog =>
-        <Blog
-          key={blog.id}
-          blog={blog}
-          handleLike={likeBlog}
-          handleRemove={removeBlog}
-          currentUser={user}
-        />
-      )}
+            {[...blogs].sort((a, b) => b.likes - a.likes).map(blog =>
+              <Blog
+                key={blog.id}
+                blog={blog}
+                handleLike={likeBlog}
+                handleRemove={removeBlog}
+                currentUser={user}
+              />
+            )}
+          </div>
+        } />
+      </Routes>
     </div>
   )
 }
