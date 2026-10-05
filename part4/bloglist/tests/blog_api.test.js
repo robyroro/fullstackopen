@@ -5,12 +5,18 @@ const supertest = require('supertest')
 const app = require('../app')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
 beforeEach(async () => {
+  await User.deleteMany({})
   await Blog.deleteMany({})
-  await Blog.insertMany(helper.initialBlogs)
+
+  const user = new User({ username: 'root', name: 'Superuser', passwordHash: 'x' })
+  await user.save()
+
+  await Blog.insertMany(helper.initialBlogs.map(blog => ({ ...blog, user: user._id })))
 })
 
 test('blogs are returned as json', async () => {
