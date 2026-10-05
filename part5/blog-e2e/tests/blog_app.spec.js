@@ -87,6 +87,29 @@ describe('Blog app', () => {
       await expect(blog.getByRole('button', { name: 'like' })).toBeVisible()
       await expect(blog.getByRole('button', { name: 'remove' })).not.toBeVisible()
     })
-  // end of when logged in
+
+    test('blogs are ordered by likes, most liked first', async ({ page }) => {
+      await createBlog(page, 'first blog', 'Writer', 'https://example.com/1')
+      await createBlog(page, 'second blog', 'Writer', 'https://example.com/2')
+      await createBlog(page, 'third blog', 'Writer', 'https://example.com/3')
+
+      const likeTimes = async (title, times) => {
+        const blog = page.locator('.blog').filter({ hasText: title })
+        await blog.getByRole('button', { name: 'view' }).click()
+        for (let i = 1; i <= times; i++) {
+          await blog.getByRole('button', { name: 'like' }).click()
+          await blog.getByText(`likes ${i}`).waitFor()
+        }
+      }
+
+      await likeTimes('third blog', 3)
+      await likeTimes('first blog', 1)
+      await likeTimes('second blog', 2)
+
+      const blogs = page.locator('.blog')
+      await expect(blogs.nth(0)).toContainText('third blog')
+      await expect(blogs.nth(1)).toContainText('second blog')
+      await expect(blogs.nth(2)).toContainText('first blog')
+    })
   })
 })
