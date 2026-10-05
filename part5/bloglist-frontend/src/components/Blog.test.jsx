@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
 const blog = {
@@ -20,4 +21,16 @@ test('renders title and author but not url or likes by default', () => {
   expect(screen.queryByText('https://testing-library.com/')).toBeNull()
   expect(screen.queryByText('likes 7')).toBeNull()
   expect(container.querySelector('.blogDetails')).toBeNull()
+})
+
+test('shows url and likes after clicking the view button', async () => {
+  const { container } = render(<Blog blog={blog} />)
+
+  const user = userEvent.setup()
+  const button = screen.getByText('view')
+  await user.click(button)
+
+  const details = container.querySelector('.blogDetails')
+  expect(details).toHaveTextContent('https://testing-library.com/')
+  expect(details).toHaveTextContent('likes 7')
 })
