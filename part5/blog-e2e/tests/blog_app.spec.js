@@ -47,6 +47,17 @@ describe('Blog app', () => {
       await createBlog(page, 'Playwright makes e2e testing easy', 'Test Writer', 'https://playwright.dev/')
       await expect(page.locator('.blog').getByText('Playwright makes e2e testing easy Test Writer')).toBeVisible()
     })
+
+    test('a blog can be liked', async ({ page }) => {
+      await createBlog(page, 'Likeable blog', 'Test Writer', 'https://example.com/like')
+
+      const blog = page.locator('.blog').filter({ hasText: 'Likeable blog' })
+      await blog.getByRole('button', { name: 'view' }).click()
+      await expect(blog.getByText('likes 0')).toBeVisible()
+
+      await blog.getByRole('button', { name: 'like' }).click()
+      await expect(blog.getByText('likes 1')).toBeVisible()
+    })
   // end of when logged in
   })
 })
