@@ -82,6 +82,20 @@ const App = () => {
     setBlogs(blogs.map(b => b.id !== blog.id ? b : { ...returnedBlog, user: blog.user }))
   }
 
+  const removeBlog = async (blog) => {
+    if (!window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      return
+    }
+
+    try {
+      await blogService.remove(blog.id)
+      setBlogs(blogs.filter(b => b.id !== blog.id))
+      notify(`removed blog ${blog.title}`)
+    } catch (error) {
+      notify(error.response?.data?.error || 'removing the blog failed', 'error')
+    }
+  }
+
   if (user === null) {
     return (
       <div>
@@ -127,7 +141,13 @@ const App = () => {
       </Togglable>
 
       {[...blogs].sort((a, b) => b.likes - a.likes).map(blog =>
-        <Blog key={blog.id} blog={blog} handleLike={likeBlog} />
+        <Blog
+          key={blog.id}
+          blog={blog}
+          handleLike={likeBlog}
+          handleRemove={removeBlog}
+          currentUser={user}
+        />
       )}
     </div>
   )
