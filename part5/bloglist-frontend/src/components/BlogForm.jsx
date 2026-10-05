@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { TextField, Button, Box, Typography } from '@mui/material'
 
 const BlogForm = ({ createBlog }) => {
   const [title, setTitle] = useState('')
@@ -14,42 +15,40 @@ const BlogForm = ({ createBlog }) => {
   }
 
   return (
-    <div>
-      <h2>create new</h2>
+    <Box sx={{ maxWidth: 480 }}>
+      <Typography variant="h5" gutterBottom>
+        create new
+      </Typography>
       <form onSubmit={addBlog}>
-        <div>
-          <label>
-            title:
-            <input
-              value={title}
-              onChange={({ target }) => setTitle(target.value)}
-              placeholder="title"
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            author:
-            <input
-              value={author}
-              onChange={({ target }) => setAuthor(target.value)}
-              placeholder="author"
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            url:
-            <input
-              value={url}
-              onChange={({ target }) => setUrl(target.value)}
-              placeholder="url"
-            />
-          </label>
-        </div>
-        <button type="submit">create</button>
+        <TextField
+          label="title"
+          value={title}
+          onChange={({ target }) => setTitle(target.value)}
+          placeholder="title"
+          fullWidth
+          margin="dense"
+        />
+        <TextField
+          label="author"
+          value={author}
+          onChange={({ target }) => setAuthor(target.value)}
+          placeholder="author"
+          fullWidth
+          margin="dense"
+        />
+        <TextField
+          label="url"
+          value={url}
+          onChange={({ target }) => setUrl(target.value)}
+          placeholder="url"
+          fullWidth
+          margin="dense"
+        />
+        <Button variant="contained" type="submit" sx={{ mt: 1 }}>
+          create
+        </Button>
       </form>
-    </div>
+    </Box>
   )
 }
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Routes, Route, Link, Navigate, useNavigate, useMatch } from 'react-router-dom'
+import { Container } from '@mui/material'
 import BlogForm from './components/BlogForm'
 import BlogList from './components/BlogList'
 import BlogView from './components/BlogView'
@@ -105,7 +106,7 @@ const App = () => {
   }
 
   return (
-    <div>
+    <Container>
       <div>
         <Link style={padding} to="/">blogs</Link>
         {user && <Link style={padding} to="/create">create new</Link>}
@@ -135,7 +136,7 @@ const App = () => {
         } />
         <Route path="/" element={<BlogList blogs={blogs} />} />
       </Routes>
-    </div>
+    </Container>
   )
 }
 
