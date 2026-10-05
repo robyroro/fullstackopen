@@ -1,0 +1,15 @@
+{
+  "name": "blog-e2e",
+  "version": "1.0.0",
+  "description": "End to end tests for the blog list app",
+  "scripts": {
+    "test": "playwright test",
+    "test:report": "playwright show-report"
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  }
+}
